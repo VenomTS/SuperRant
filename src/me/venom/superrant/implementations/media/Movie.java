@@ -3,7 +3,7 @@ package me.venom.superrant.implementations.media;
 import me.venom.superrant.implementations.types.Normal;
 import me.venom.superrant.interfaces.IMediaType;
 
-public class Game extends Media
+public class Movie extends Media
 {
     private final float mediaRentPrice = 2.50f;
     private final float mediaOverdueFee = 1.25f;
@@ -14,7 +14,7 @@ public class Game extends Media
     private float userReviewGrade, criticsReviewGrade;
     private IMediaType mediaType;
 
-    public Game(String name, int rentalCode, IMediaType mediaType)
+    public Movie(String name, int rentalCode, IMediaType mediaType)
     {
         setName(name);
         setRentalCode(rentalCode);
