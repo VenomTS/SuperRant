@@ -1,0 +1,13 @@
+# Blueprint
+# SerialNumber is the name of the file
+# Data here is data about the content of an item
+Name: "Ne znam vise"
+Description: "Sta cu da radim"
+Genre: "Game"
+RentalCode: 203
+TimesRented: 0
+UserReview: 0
+CriticsReview: 0
+UserReviewCount: 0
+CriticsReviewCount: 0
+Type: "Promotional"

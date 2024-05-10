@@ -1,0 +1,5 @@
+In Rentals, we store data as such:
+1:
+    DueDate: "DD-MM-YYYY"
+    DateReturned: "DD-MM-YYYY"
+    ItemSerialNumber: "SerialNumberOfItemInIntForm"

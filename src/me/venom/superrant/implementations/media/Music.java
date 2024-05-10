@@ -5,13 +5,13 @@ import me.venom.superrant.interfaces.IMediaType;
 
 public class Music extends Media
 {
-    private final float mediaRentPrice = 2.50f;
-    private final float mediaOverdueFee = 1.25f;
+    private final float mediaRentPrice = 1f;
+    private final float mediaOverdueFee = 1f;
 
     private String name, description;
     private int rentalCode, timesRented;
     private int numberOfUserReviews, numberOfCriticReviews;
-    private float userReviewGrade, criticsReviewGrade;
+    private int userReviewGrade, criticsReviewGrade;
     private IMediaType mediaType;
 
     public Music(String name, int rentalCode, IMediaType mediaType)
@@ -22,7 +22,20 @@ public class Music extends Media
 
         description = "No Description";
         timesRented = 0;
-        userReviewGrade = criticsReviewGrade = 0.0f;
+        userReviewGrade = criticsReviewGrade = 0;
+    }
+
+    public Music(String name, String description, String type, int rentalCode, int timesRented, int userReviewCount, int criticsReviewCount, int userReview, int criticsReview) throws Exception
+    {
+        this.name = name;
+        this.description = description;
+        this.mediaType = (IMediaType) Class.forName("me.venom.superrant.implementations.types." + type).getDeclaredConstructor().newInstance();
+        this.rentalCode = rentalCode;
+        this.timesRented = timesRented;
+        this.numberOfUserReviews = userReviewCount;
+        this.numberOfCriticReviews = criticsReviewCount;
+        this.userReviewGrade = userReview;
+        this.criticsReviewGrade = criticsReview;
     }
 
     @Override
@@ -33,6 +46,9 @@ public class Music extends Media
 
     @Override
     public int getRentalCode() { return rentalCode; }
+
+    @Override
+    public int getRentDuration() { return mediaType.getRentDurationInDays(); }
 
     @Override
     public IMediaType getMediaType() { return mediaType; }
@@ -65,13 +81,13 @@ public class Music extends Media
     @Override
     public float getUserReview()
     {
-        return userReviewGrade / numberOfUserReviews;
+        return (userReviewGrade * 1.f) / Math.max(1, numberOfUserReviews);
     }
 
     @Override
     public float getCriticsReview()
     {
-        return criticsReviewGrade / numberOfCriticReviews;
+        return (criticsReviewGrade * 1.f) / Math.max(1, numberOfCriticReviews);
     }
 
     @Override
@@ -79,6 +95,14 @@ public class Music extends Media
 
     @Override
     public float getOverdueFee() { return mediaOverdueFee; }
+
+    @Override
+    public String toString()
+    {
+        return "Name: " + name + " | Type: " + mediaType.getType() + " | Genre: Music | Description: " + description + "\n" +
+                "Rental Code: " + rentalCode + " | Media Price: " + mediaRentPrice + "$ | Media Overdue Fee: " + mediaOverdueFee + "$\n" +
+                "Rental Statistics: Rented " + timesRented + " times - User Review: " + getUserReview() + " - Critics Review: " + getCriticsReview();
+    }
 
     private void setName(String name)
     {

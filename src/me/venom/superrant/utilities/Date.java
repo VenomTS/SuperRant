@@ -1,5 +1,7 @@
 package me.venom.superrant.utilities;
 
+import java.util.Calendar;
+
 public class Date
 {
     private int day, month, year, maxDays;
@@ -11,6 +13,22 @@ public class Date
         setYear(year);
         setMonth(month);
         setDay(day);
+    }
+
+    public Date()
+    {
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH) + 1;
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        setYear(year);
+        setMonth(month);
+        setDay(day);
+    }
+
+    public String getFriendlyDateString()
+    {
+        return String.valueOf(day) + '-' + month + '-' + year;
     }
 
     public int getDay() { return day; }

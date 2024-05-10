@@ -9,4 +9,7 @@ public class Promotional implements IMediaType
 
     @Override
     public int getRentDurationInDays() { return rentDuration; }
+
+    @Override
+    public String getType() { return "Promotional"; }
 }

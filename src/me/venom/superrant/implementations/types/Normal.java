@@ -9,4 +9,7 @@ public class Normal implements IMediaType
 
     @Override
     public int getRentDurationInDays() { return rentDuration; }
+
+    @Override
+    public String getType() { return "Normal"; }
 }

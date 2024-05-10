@@ -9,5 +9,7 @@ public abstract class Media implements IRentalStatistics, IRentalPricing
     public abstract String getName();
     public abstract String getDescription();
     public abstract int getRentalCode();
+    public abstract int getRentDuration();
     public abstract IMediaType getMediaType();
+    public abstract String toString();
 }
