@@ -24,6 +24,7 @@ public class Catalog
 
     public void addMedia(Media media)
     {
+        if(offeredMedia.contains(media)) return;
         offeredMedia.add(media);
     }
 

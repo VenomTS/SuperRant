@@ -1,23 +1,21 @@
 package me.venom.superrant;
 
-import me.venom.superrant.implementations.media.Movie;
-import me.venom.superrant.implementations.types.Promotional;
-import org.yaml.snakeyaml.Yaml;
+import me.venom.superrant.interfaces.IPaymentMethod;
+import me.venom.superrant.utilities.FileManager;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 public class Member
 {
-    private String name, id;
+    private String name;
+    private final String id;
 
-    private final ArrayList<Rental> rentals, itemsInPossession;
+    // The idea is that user has to set up paymentMethod that he wants to use and cannot switch from one to another without notifying the store...
+    private IPaymentMethod paymentMethod;
 
-    private ArrayList<Item> itemsInCart;
+    private final ArrayList<Rental> rentals;
+
+    private final ArrayList<Item> itemsInCart, itemsInPossession;
     private Store currStore;
 
     public Member(String id)
@@ -25,27 +23,62 @@ public class Member
         this.id = id;
         rentals = new ArrayList<>();
         itemsInPossession = new ArrayList<>();
-        loadMemberData();
+        itemsInCart = new ArrayList<>();
+        FileManager.loadMemberData(this);
     }
 
     public void enterStore(Store store)
     {
         if(store == null) throw new RuntimeException("Person entered null store...");
         currStore = store;
+        currStore.scanMemberCard(this);
+    }
+    public void exitStore()
+    {
+        if(currStore == null) return;
+        for(Item item : itemsInCart)
+        {
+            currStore.putItemOnShelf(item);
+        }
+        itemsInCart.clear();
+        currStore = null;
     }
 
     public String getID() { return id; }
+    public ArrayList<Rental> getAllRentals() { return rentals; }
+    public ArrayList<Item> getItemsInCart() { return itemsInCart; }
+    public void setName(String name) { this.name = name; }
 
-    public void exitStore() { currStore = null; }
-
-    public void viewItemsInCurrentStore()
+    public void setPaymentMethod(IPaymentMethod method)
     {
-        if(currStore == null) return;
-        //store.displayItems();
+        if(method == null) return;
+        paymentMethod = method;
+    }
+
+    public boolean doesUserHaveEnoughMoney(double amount)
+    {
+        return paymentMethod.hasEnoughBalance(amount);
+    }
+
+    public void putMoneyIntoPaymentMethod(double amount)
+    {
+        if(amount <= 0) return;
+        paymentMethod.deposit(amount);
+    }
+
+    public void addRental(Rental rental) { rentals.add(rental); }
+    public void addItemToPossession(Item item) { itemsInPossession.add(item); }
+
+    public void payAmount(double amount)
+    {
+        if(amount > paymentMethod.getBalance()) return;
+        paymentMethod.withdraw(amount);
+        FileManager.updateBalance(this, -amount);
     }
     public void putItemInCart(Item item)
     {
         if(currStore == null || !currStore.containsItem(item)) return;
+        itemsInCart.add(item);
         currStore.removeItemFromShelf(item);
     }
     public void removeItemFromCart(Item item)
@@ -55,84 +88,28 @@ public class Member
         currStore.putItemOnShelf(item);
     }
 
-    public void returnItem()
+    public void returnItem(Item item)
     {
+        // Note
+        // I did not have enough time to make an efficient solution for how to update rental information about when the item was returned
+        // Thus to check for overdue fees, you will have to manually change the date returned to something before today
+        // I am sorry for this inconvenience - should've used SQL for this...
+        if(currStore == null || !itemsInPossession.contains(item)) return;
+        FileManager.transferItemFromMemberToStore(this, currStore, item);
+        currStore.processReturn(item);
     }
-
     public void rentItemsFromCart()
     {
-        RentalInfo rentalInfo;
-        Rental rental = new Rental();
-        for(Item item : itemsInCart)
-        {
-            rentalInfo = new RentalInfo(item);
-            rental.addRentalInfo(rentalInfo);
-        }
+        if(currStore == null || itemsInCart.isEmpty()) return;
+        Rental rental = currStore.scanItems(this, itemsInCart);
+        if(rental == null) return;
         rental.recordRental(this);
         rentals.add(rental);
-    }
-
-    public void loadMemberData()
-    {
-        try
-        {
-            String path = "RequiredFiles/Members/" + id + ".yml";
-            InputStream inputStream = new FileInputStream(path);
-            Yaml storeFile = new Yaml();
-            Map<String, Object> data = storeFile.load(inputStream);
-            this.name = (String) data.get("Name");
-
-            ArrayList listOfRentals = (ArrayList) data.get("Rentals");
-            for(Object obj : listOfRentals)
-            {
-                rentals.add(getRentalWithID((int) obj));
-            }
-        }
-        catch(FileNotFoundException exception)
-        {
-            System.out.println("File " + id + ".yml could not be found!");
-        }
-    }
-
-    public Rental getRentalWithID(int rentalID)
-    {
-        Rental rental = new Rental();
-        try
-        {
-            String path = "RequiredFiles/Rentals/" + rentalID + ".yml";
-            InputStream inputStream = new FileInputStream(path);
-            Yaml yaml = new Yaml();
-            Map<String, Object> data = yaml.load(inputStream);
-            HashMap currMap;
-            RentalInfo rentalInfo;
-            String dueDate, dateReturned;
-            int serialNumber;
-            for(int i = 1; i <= data.size(); i++)
-            {
-                currMap = (HashMap) data.get(i);
-                dueDate = (String) currMap.get("DueDate");
-                dateReturned = (String) currMap.get("DateReturned");
-                serialNumber = (int) currMap.get("ItemSerialNumber");
-                rentalInfo = new RentalInfo(dueDate, dateReturned, serialNumber);
-                rental.addRentalInfo(rentalInfo);
-            }
-        }
-        catch(FileNotFoundException exception)
-        {
-            System.out.println("Rental file with ID " + rentalID + " could not be found!");
-        }
-        return rental;
     }
 
     @Override
     public String toString()
     {
-        StringBuilder builder = new StringBuilder();
-        builder.append("Name: ").append(name).append(" | ID: ").append(id).append(" | Rentals: \n");
-        for(Rental rental : rentals)
-        {
-            builder.append("\n").append(rental);
-        }
-        return builder.toString();
+        return "Name: " + name + " | ID: " + id;
     }
 }

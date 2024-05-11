@@ -31,6 +31,16 @@ public class Item
         this.serialNumber = serialNumber;
     }
 
+    public double getOverdueFee()
+    {
+        return media.getOverdueFee();
+    }
+
+    public double getPrice()
+    {
+        return media.getRentalPrice();
+    }
+
     private void setMedia(Media media)
     {
         if(media == null) return;
@@ -39,8 +49,17 @@ public class Item
 
     public Media getMedia() { return media; }
 
+    @Override
+    public boolean equals(Object object)
+    {
+        if(object == this) return true;
+        if(object == null || getClass() != object.getClass()) return false;
+        Item item = (Item) object;
+        return serialNumber == item.serialNumber; // Since serial numbers SHOULD be unique, it is enough to compare them
+    }
+
     public String toString()
     {
-        return "Serial Number of Item: " + serialNumber + "\nMedia Info:\n" + media;
+        return "Serial Number of Item: " + serialNumber + " | " + media;
     }
 }

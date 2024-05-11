@@ -1,6 +1,7 @@
 package me.venom.superrant;
 
 import me.venom.superrant.utilities.Date;
+import me.venom.superrant.utilities.FileManager;
 
 import java.util.ArrayList;
 
@@ -19,13 +20,24 @@ public class DailyLog
         month = Integer.parseInt(newDate[1]);
         year = Integer.parseInt(newDate[2]);
         date = new Date(day, month, year);
-        fillRentals(stringDate);
+        FileManager.fetchRentalsForDailyLog(this);
     }
 
     public DailyLog()
     {
         setDate(new Date());
         rentals = new ArrayList<>();
+        FileManager.createDailyLog(this);
+    }
+
+    public void addRental(Rental rental)
+    {
+        rentals.add(rental);
+    }
+
+    public String getDailyLogDateInFriendlyString()
+    {
+        return date.getFriendlyDateString();
     }
 
     private void setDate(Date date)
@@ -34,9 +46,4 @@ public class DailyLog
     }
 
     public Date getDate() { return date; }
-
-    private void fillRentals(String storedFile)
-    {
-        String filePath = "RequiredFiles/DailyLogs/" + storedFile + ".yml";
-    }
 }

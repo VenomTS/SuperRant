@@ -1,8 +1,11 @@
 package me.venom.superrant;
 
+import me.venom.superrant.utilities.Date;
+import me.venom.superrant.utilities.FileManager;
+
 import java.io.File;
-import java.io.FileInputStream;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class SuperRant
 {
@@ -18,9 +21,39 @@ public class SuperRant
         members = new ArrayList<>();
         loadAllStores();
         loadAllMembers();
+        loadAllDailyLogs();
+        if(!doesTodaysLogExist())
+        {
+            dailyLogs.add(new DailyLog());
+        }
     }
 
     public ArrayList<Store> getStores() { return stores; }
+    public ArrayList<Member> getMembers() { return members; }
+
+    private boolean doesTodaysLogExist()
+    {
+        Date today = new Date();
+        for(DailyLog log : dailyLogs)
+        {
+            if(log.getDate().equals(today)) return true;
+        }
+        return false;
+    }
+
+    public Member getRandomMember()
+    {
+        Random random = new Random();
+        int selected = random.nextInt(members.size());
+        return members.get(selected);
+    }
+
+    public Store getRandomStore()
+    {
+        Random random = new Random();
+        int selected = random.nextInt(stores.size());
+        return stores.get(selected);
+    }
 
     private void loadAllStores()
     {
@@ -56,5 +89,11 @@ public class SuperRant
         {
             dailyLogs.add(new DailyLog(file.getName().replace(".yml", "")));
         }
+    }
+
+    public void notifyReturn(Item item, Store store)
+    {
+        System.out.println("SUPERRANT NOTIFICATION");
+        System.out.println("Item " + item + " has been returned to " + store.getName());
     }
 }

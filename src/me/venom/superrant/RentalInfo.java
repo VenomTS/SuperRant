@@ -1,11 +1,8 @@
 package me.venom.superrant;
 
-import me.venom.superrant.implementations.media.Movie;
-import me.venom.superrant.implementations.types.Normal;
 import me.venom.superrant.utilities.Date;
 import me.venom.superrant.utilities.FileManager;
-
-import java.util.Arrays;
+import me.venom.superrant.utilities.UtilityClass;
 
 public class RentalInfo
 {
@@ -22,22 +19,20 @@ public class RentalInfo
 
     public RentalInfo(String dueDate, String dateReturned, int itemSerialNumber)
     {
-        String[] newDueDate = dueDate.split("-");
-        String[] newDateReturned = dateReturned.split("-");
-        int day, month, year;
-        day = Integer.parseInt(newDueDate[0]);
-        month = Integer.parseInt(newDueDate[1]);
-        year = Integer.parseInt(newDueDate[2]);
-        this.dueDate = new Date(day, month, year);
-        day = Integer.parseInt(newDateReturned[0]);
-        month = Integer.parseInt(newDateReturned[1]);
-        year = Integer.parseInt(newDateReturned[2]);
-        if(year == 0) this.dateReturned = null;
-        else this.dateReturned = new Date(day, month, year);
+        int[] dueDateInt = UtilityClass.getDayMonthYearFromString(dueDate);
+        int[] dateReturnedInt = UtilityClass.getDayMonthYearFromString(dateReturned);
+        this.dueDate = new Date(dueDateInt[0], dueDateInt[1], dueDateInt[2]);
+        if(dateReturnedInt[2] == 0) this.dateReturned = null;
+        else this.dateReturned = new Date(dateReturnedInt[0], dateReturnedInt[1], dateReturnedInt[2]);
         this.rentedItem = FileManager.getItemFromFile(itemSerialNumber);
     }
 
-    public boolean isItemReturned() { return dateReturned != null; }
+    public double getOverdueFee()
+    {
+        if(dateReturned == null) return 0; // Person has still not returned the item, thus we don't know their overdue fees!
+        int daysOverdue = UtilityClass.getDifferenceBetweenTwoDates(dueDate, dateReturned);
+        return daysOverdue * rentedItem.getOverdueFee();
+    }
 
     public void markItemReturned()
     {

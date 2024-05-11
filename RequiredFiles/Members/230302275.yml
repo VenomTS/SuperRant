@@ -1,3 +1,5 @@
 Name: Adnan Adrovic
-Rentals: [1, 2]
-ItemsInPossession: []
+PaymentMethod: Cash
+Balance: 255.62
+Rentals: [1]
+ItemsInPossession: [2]

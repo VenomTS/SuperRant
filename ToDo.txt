@@ -1,0 +1,2 @@
+Dodati provjeru da li postoji danasnji DailyLogs
+Zavrsiti DailyLogs

@@ -1,14 +1,10 @@
 package me.venom.superrant;
 
+import me.venom.superrant.implementations.media.Media;
+import me.venom.superrant.utilities.Date;
 import me.venom.superrant.utilities.FileManager;
-import me.venom.superrant.utilities.UtilityClass;
-import org.yaml.snakeyaml.Yaml;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Map;
 
 public class Store
 {
@@ -21,12 +17,12 @@ public class Store
 
     public Store(String name, SuperRant superRant)
     {
-        //if(superRant == null) throw new RuntimeException("Every store has to be part of chain of stores under supervision of SuperRant store!");
-        setName(name);
-        setParentStore(superRant);
-        setCatalog();
+        if(superRant == null) throw new RuntimeException("Every store has to be part of chain of stores under supervision of SuperRant store!");
+        this.name = name;
+        this.superRant = superRant;
+        this.storeCatalog = new Catalog(name);
         itemsInStore = new ArrayList<>();
-        loadItemsFromFile();
+        FileManager.loadStoreItemsFromFile(this);
     }
 
     public ArrayList<Item> getItemsInStore()
@@ -34,15 +30,66 @@ public class Store
         return itemsInStore;
     }
 
-    private void setName(String name)
+    public void processReturn(Item item)
     {
-        if(name == null || name.isEmpty()) name = "Unnamed store";
-        this.name = name;
+        superRant.notifyReturn(item, this);
     }
 
-    private void setCatalog()
+    public void scanMemberCard(Member member)
     {
-        storeCatalog = new Catalog(name);
+        System.out.println("Member Info: \n" + member);
+        double overdueFees = 0;
+        for(Rental rental : member.getAllRentals())
+        {
+            overdueFees += rental.getOverdueFees();
+        }
+        if(!member.doesUserHaveEnoughMoney(overdueFees))
+        {
+            System.out.println("Member cannot use store services because overdue fees are higher than his balance!");
+            member.exitStore();
+            return;
+        }
+        if(overdueFees == 0)
+        {
+            System.out.println("Customer does not have any overdue fees!");
+            return;
+        }
+        System.out.println("Customer has had a loan of " + overdueFees + "$ which he has just paid");
+        member.payAmount(overdueFees);
+    }
+    public Rental scanItems(Member member, ArrayList<Item> items)
+    {
+        double price = 0;
+        RentalInfo rentalInfo;
+        Rental rental = new Rental();
+        for(Item item : items)
+        {
+            price += item.getPrice();
+            if(!member.doesUserHaveEnoughMoney(price))
+            {
+                System.out.println("The user does not have enough money to rent all selected items\nRest of the items will not be scanned");
+                price -= item.getPrice();
+                break;
+            }
+            FileManager.transferItemFromStoreToMember(member, this, item);
+            rentalInfo = new RentalInfo(item);
+            rental.addRentalInfo(rentalInfo);
+            member.addItemToPossession(item);
+        }
+        member.payAmount(price);
+        if(price == 0) return null;
+        System.out.println("Receipt: " + rental);
+        return rental;
+    }
+
+    public String getName()
+    {
+        return this.name;
+    }
+
+    public void addMediaToCatalog(Media media)
+    {
+        storeCatalog.addMedia(media);
     }
 
     public boolean containsItem(int serialNumber)
@@ -59,57 +106,7 @@ public class Store
         return itemsInStore.contains(item);
     }
 
-    private void setParentStore(SuperRant superRant)
-    {
-        this.superRant = superRant;
-    }private ArrayList getItemIDs()
-{
-    try
-    {
-        String path = "RequiredFiles/Stores/" + name + ".yml";
-        InputStream inputStream = new FileInputStream(path);
-        Yaml storeFile = new Yaml();
-        Map<String, Object> data = storeFile.load(inputStream);
-
-        return (ArrayList) data.get("Items");
-    }
-    catch(FileNotFoundException exception)
-    {
-        System.out.println("File " + name + ".yml could not be found!");
-    }
-    return null;
-}
-
-    private void loadItemFromID(Object itemID)
-    {
-        Item item = FileManager.getItemFromFile((int) itemID);
-        itemsInStore.add(item);
-        storeCatalog.addMedia(item.getMedia());
-    }
-
-    private void loadItemsFromFile()
-    {
-        ArrayList array = getItemIDs();
-        if(array == null) throw new RuntimeException("There was an error while trying to load items!");
-        try
-        {
-            for(Object itemID : array)
-            {
-                if(UtilityClass.isItemAlreadyInDifferentStore((int) itemID, this, superRant))
-                {
-                    System.out.println("Found the same item in two stores! It is going to be skipped for " + name + "\n" +
-                            "Serial Number: " + itemID);
-                    continue;
-                }
-                loadItemFromID(itemID);
-            }
-        }
-        catch(Exception e)
-        {
-            // I know this is not the most constructive method, but since I am the one doing calls, I will allow myself to do this
-            System.out.println("Something went wrong - Could not load items from file!");
-        }
-    }
+    public SuperRant getParentStore() { return superRant; }
 
     public void putItemOnShelf(Item item)
     {

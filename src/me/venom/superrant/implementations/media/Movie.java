@@ -91,17 +91,22 @@ public class Movie extends Media
     }
 
     @Override
-    public float getRentalPrice() { return mediaRentPrice; }
+    public double getRentalPrice() { return mediaRentPrice; }
 
     @Override
-    public float getOverdueFee() { return mediaOverdueFee; }
+    public double getOverdueFee() { return mediaOverdueFee; }
 
-    @Override
+    /*@Override
     public String toString()
     {
         return "Name: " + name + " | Type: " + mediaType.getType() + " | Genre: Movie | Description: " + description + "\n" +
                 "Rental Code: " + rentalCode + " | Media Price: " + mediaRentPrice + "$ | Media Overdue Fee: " + mediaOverdueFee + "$\n" +
                 "Rental Statistics: Rented " + timesRented + " times - User Review: " + getUserReview() + " - Critics Review: " + getCriticsReview();
+    }*/
+    @Override
+    public String toString()
+    {
+        return "Name: " + name + " | Type: " + mediaType.getType() + " | Genre: Movie | Description: " + description;
     }
 
     private void setName(String name)

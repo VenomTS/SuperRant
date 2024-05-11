@@ -46,6 +46,8 @@ public class Date
                 month = 1;
                 year += 1;
             }
+            maxDays = maxDaysBase[month - 1];
+            if(isLeapYear(year) && month == 2) maxDays = 29;
         }
     }
 
@@ -69,5 +71,14 @@ public class Date
     private boolean isLeapYear(int year)
     {
         return year % 4 == 0 || (year % 100 == 0 && year % 400 == 0);
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if(obj == this) return true;
+        if(obj == null || getClass() != obj.getClass()) return false;
+        Date date = (Date) obj;
+        return day == date.day && month == date.month && year == date.year;
     }
 }
