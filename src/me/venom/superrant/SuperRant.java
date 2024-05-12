@@ -41,21 +41,21 @@ public class SuperRant
         return false;
     }
 
-    public ArrayList<Rental> getAllRentalsFromToday(int index)
+    public ArrayList<Rental> getAllRentals(int index)
     {
         if(index < 0 || index >= dailyLogs.size()) return new ArrayList<>();
         DailyLog log = dailyLogs.get(index);
         return log.getRentals();
     }
 
-    public Member getRandomMember()
+    public Member getRandomMember() // This function is not in UML since it is only used for testing purposes
     {
         Random random = new Random();
         int selected = random.nextInt(members.size());
         return members.get(selected);
     }
 
-    public Store getRandomStore()
+    public Store getRandomStore() // This function is not in UML since it is only used for testing purposes
     {
         Random random = new Random();
         int selected = random.nextInt(stores.size());

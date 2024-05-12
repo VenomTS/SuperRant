@@ -20,14 +20,6 @@ public final class UtilityClass
         return false;
     }
 
-    public static int findLargestNumberFileInFolder(String path)
-    {
-        File file = new File(path);
-        File[] listOfFiles = file.listFiles();
-        if(listOfFiles == null) return 1;
-        return listOfFiles.length + 1;
-    }
-
     public static int[] getDayMonthYearFromString(String str)
     {
         String[] newStr = str.split("-");
@@ -38,10 +30,10 @@ public final class UtilityClass
         return new int[] {day, month, year};
     }
 
-    public static int getDifferenceBetweenTwoDates(Date dueDate, Date today)
+    public static int getDifferenceBetweenTwoDates(Date dueDate, Date returnDate)
     {
         int count = 0;
-        while(!dueDate.equals(today)) // Fastest way I thought of...
+        while(!dueDate.equals(returnDate)) // Fastest way I thought of...
         {
             count += 1;
             dueDate.addDays(1);

@@ -36,6 +36,4 @@ public class Catalog
             System.out.println(media);
         }
     }
-
-    // TODO - Add displayMedia that store has to offer!
 }

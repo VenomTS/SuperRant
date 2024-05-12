@@ -327,7 +327,7 @@ public final class FileManager
     private static File getFirstFreeRentalFile()
     {
         path = "RequiredFiles/Rentals/";
-        int largestFreeFileNumber = UtilityClass.findLargestNumberFileInFolder(path);
+        int largestFreeFileNumber = findLargestNumberFileInFolder(path);
         File file = new File(path + largestFreeFileNumber + ".yml");
         while(file.exists())
         {
@@ -350,5 +350,13 @@ public final class FileManager
     {
         try { return new FileInputStream(path); }
         catch (FileNotFoundException e) { System.out.println("Tried accessing non-existant file!\nFile Path: " + path); return null; }
+    }
+
+    private static int findLargestNumberFileInFolder(String path)
+    {
+        File file = new File(path);
+        File[] listOfFiles = file.listFiles();
+        if(listOfFiles == null) return 1;
+        return listOfFiles.length + 1;
     }
 }
