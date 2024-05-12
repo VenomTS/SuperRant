@@ -30,6 +30,11 @@ public class DailyLog
         FileManager.createDailyLog(this);
     }
 
+    public ArrayList<Rental> getRentals()
+    {
+        return rentals;
+    }
+
     public void addRental(Rental rental)
     {
         rentals.add(rental);

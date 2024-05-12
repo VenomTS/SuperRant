@@ -41,6 +41,13 @@ public class SuperRant
         return false;
     }
 
+    public ArrayList<Rental> getAllRentalsFromToday(int index)
+    {
+        if(index < 0 || index >= dailyLogs.size()) return new ArrayList<>();
+        DailyLog log = dailyLogs.get(index);
+        return log.getRentals();
+    }
+
     public Member getRandomMember()
     {
         Random random = new Random();
