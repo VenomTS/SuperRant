@@ -14,6 +14,8 @@ import java.util.Map;
 public final class FileManager
 {
 
+    private FileManager() {}
+
     private static String path;
     private static InputStream inputStream;
 

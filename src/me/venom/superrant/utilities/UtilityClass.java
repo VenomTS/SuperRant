@@ -7,6 +7,9 @@ import java.io.File;
 
 public final class UtilityClass
 {
+
+    private UtilityClass() {}
+
     public static boolean isItemAlreadyInDifferentStore(int serialNumber, Store currStore, SuperRant superRant)
     {
         for(Store store : superRant.getStores())

@@ -10,7 +10,7 @@ public class Main
 
         //buyItems(superRant);
 
-        returnItem(superRant);
+        //returnItem(superRant);
     }
 
     private static void buyItems(SuperRant superRant)
